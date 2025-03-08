@@ -1,0 +1,14 @@
+asyncio==3.4.3
+beautifulsoup4==4.12.2
+bs4==0.0.2
+currency-converter==0.17.8
+geopy==2.3.0
+httpx==0.27.0
+lxml==5.1.0
+pillow==10.2.0
+python-dotenv==1.0.1
+python-telegram-bot==20.8
+pytz==2024.1
+requests==2.31.0
+soupsieve==2.5
+wikipedia-api==0.6.0
