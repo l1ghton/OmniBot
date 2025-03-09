@@ -11,7 +11,7 @@ import asyncio
 from datetime import time
 
 from dotenv import load_dotenv
-load_dotenv()  # Загружает переменные из файла .env
+load_dotenv()  # Загружает переменные из .env
 
 from telegram import (
     Update,
@@ -30,7 +30,7 @@ from telegram.ext import (
     ContextTypes,
 )
 
-# ------------------ Настройка логирования ------------------
+# ------------------ Логирование ------------------
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
@@ -39,12 +39,12 @@ logger = logging.getLogger(__name__)
 # ------------------ Конфигурация ------------------
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY")
-BASE_CURRENCY = "RUB"  # для курсов валют
+BASE_CURRENCY = "RUB"
 
-# ------------------ Глобальные хранилища ------------------
-todo_tasks = {}           # {chat_id: [task, ...]}
-user_settings = {}        # {chat_id: {"city": "..." }}
-subscriptions = {}        # {(chat_id, subscription_type): job}
+# ------------------ Глобальные переменные ------------------
+todo_tasks = {}         # {chat_id: [task, ...]}
+user_settings = {}      # {chat_id: {"city": "..." }}
+subscriptions = {}      # {(chat_id, subscription_type): job}
 quiz_questions = [
     {"question": "Сколько будет 2+2?", "options": ["3", "4", "5"], "answer": "4"},
     {"question": "Столица Франции?", "options": ["Берлин", "Париж", "Рим"], "answer": "Париж"},
@@ -56,7 +56,7 @@ quiz_questions = [
     {"question": "Что всегда растёт, но не стареет?", "options": ["Дерево", "Растение", "Возраст"], "answer": "Возраст"}
 ]
 
-# Словарь языков для переводчика с флагами
+# Языки для переводчика
 LANGUAGES = {
     "ru": {"name": "Русский", "flag": "🇷🇺"},
     "en": {"name": "Английский", "flag": "🇬🇧"},
@@ -70,40 +70,40 @@ LANGUAGES = {
     "tr": {"name": "Турецкий", "flag": "🇹🇷"}
 }
 
-# ------------------ Функции команд ------------------
+# ------------------ Функции ------------------
 
-# /start и /help – выводит список команд и кнопочное меню
+# /start и /help: приветствие с кнопочным меню
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     message = (
-        "<b>Добро пожаловать в Супер-Бота!</b>\n\n"
-        "Я умею выполнять множество полезных функций:\n\n"
-        "• <b>/reminder &lt;секунды&gt; &lt;текст&gt;</b> — установить напоминание\n"
-        "• <b>/weather &lt;город&gt;</b> — текущая погода\n"
-        "• <b>/forecast [&lt;город&gt;]</b> — прогноз погоды\n"
-        "• <b>/rates</b> — курсы валют и криптовалют (базовая: RUB)\n"
-        "• <b>/search &lt;запрос&gt;</b> — поиск в Wikipedia\n"
-        "• <b>/convert &lt;значение&gt; &lt;из_единицы&gt; to &lt;в_единице&gt;</b> — конвертер\n"
-        "• <b>/translate_interactive</b> — интерактивный переводчик\n"
-        "• <b>/todo</b> — задачи (add, list, remove)\n"
-        "• <b>/quiz</b> — викторина\n"
-        "• <b>/settings</b> — настройки (например, город по умолчанию)\n"
-        "• <b>/subscribe</b> и <b>/unsubscribe</b> — подписка на уведомления\n"
-        "• <b>/top_quiz</b> — таблица лидеров по квизу\n\n"
-        "Нажмите кнопку ниже для выбора функции:"
+        "👋 <b>Привет!</b>\n\n"
+        "Я <b>OmniBot</b> — универсальный помощник. Вот что я умею:\n"
+        "🔔 /reminder &lt;секунды&gt; &lt;текст&gt; — установить напоминание\n"
+        "🌤 /weather &lt;город&gt; — текущая погода\n"
+        "⛅ /forecast [&lt;город&gt;] — прогноз погоды\n"
+        "💱 /rates — курсы валют и криптовалют (базовая: RUB)\n"
+        "🔍 /search &lt;запрос&gt; — поиск в Wikipedia\n"
+        "🔄 /convert &lt;значение&gt; &lt;из_единицы&gt; to &lt;в_единице&gt; — конвертер\n"
+        "🌐 /translate_interactive — интерактивный переводчик\n"
+        "📋 /todo — задачи (добавить, список, удалить)\n"
+        "❓ /quiz — викторина\n"
+        "⚙️ /settings — настройки (город по умолчанию и др.)\n"
+        "📰 /subscribe и /unsubscribe — подписка на уведомления\n"
+        "🏆 /top_quiz — таблица лидеров\n\n"
+        "Выберите нужную функцию ниже:"
     )
     keyboard = [
-        [InlineKeyboardButton("Напоминание", callback_data="menu_reminder")],
-        [InlineKeyboardButton("Погода", callback_data="menu_weather"),
-         InlineKeyboardButton("Прогноз", callback_data="menu_forecast")],
-        [InlineKeyboardButton("Курсы валют", callback_data="menu_rates"),
-         InlineKeyboardButton("Поиск", callback_data="menu_search")],
-        [InlineKeyboardButton("Конвертер", callback_data="menu_convert"),
-         InlineKeyboardButton("Перевод", callback_data="menu_translate")],
-        [InlineKeyboardButton("To-Do", callback_data="menu_todo"),
-         InlineKeyboardButton("Викторина", callback_data="menu_quiz")],
-        [InlineKeyboardButton("Настройки", callback_data="menu_settings"),
-         InlineKeyboardButton("Подписки", callback_data="menu_subscribe")],
-        [InlineKeyboardButton("Топ квиз", callback_data="menu_top_quiz")]
+        [InlineKeyboardButton("🔔 Напоминание", callback_data="menu_reminder")],
+        [InlineKeyboardButton("🌤 Погода", callback_data="menu_weather"),
+         InlineKeyboardButton("⛅ Прогноз", callback_data="menu_forecast")],
+        [InlineKeyboardButton("💱 Курсы", callback_data="menu_rates"),
+         InlineKeyboardButton("🔍 Поиск", callback_data="menu_search")],
+        [InlineKeyboardButton("🔄 Конвертер", callback_data="menu_convert"),
+         InlineKeyboardButton("🌐 Перевод", callback_data="menu_translate")],
+        [InlineKeyboardButton("📋 To-Do", callback_data="menu_todo"),
+         InlineKeyboardButton("❓ Викторина", callback_data="menu_quiz")],
+        [InlineKeyboardButton("⚙️ Настройки", callback_data="menu_settings"),
+         InlineKeyboardButton("📰 Подписки", callback_data="menu_subscribe")],
+        [InlineKeyboardButton("🏆 Топ квиз", callback_data="menu_top_quiz")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text(message, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
@@ -135,7 +135,7 @@ async def send_reminder(context: ContextTypes.DEFAULT_TYPE) -> None:
 async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     city = " ".join(context.args) if context.args else user_settings.get(update.effective_chat.id, {}).get("city")
     if not city:
-        await update.message.reply_text("Укажите город: /weather <город> или задайте город по умолчанию через /settings city <город>")
+        await update.message.reply_text("Укажите город: /weather <город> или задайте город через /settings")
         return
     try:
         url = f"http://api.openweathermap.org/data/2.5/weather?q={city}&appid={OPENWEATHER_API_KEY}&units=metric&lang=ru"
@@ -155,7 +155,7 @@ async def weather(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 async def forecast(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     city = " ".join(context.args) if context.args else user_settings.get(update.effective_chat.id, {}).get("city")
     if not city:
-        await update.message.reply_text("Укажите город: /forecast <город> или установите город по умолчанию через /settings city <город>")
+        await update.message.reply_text("Укажите город: /forecast <город> или задайте город через /settings")
         return
     try:
         url = f"http://api.openweathermap.org/data/2.5/forecast?q={city}&appid={OPENWEATHER_API_KEY}&units=metric&lang=ru"
@@ -302,6 +302,7 @@ async def translation_text_handler(update: Update, context: ContextTypes.DEFAULT
 # Управление задачами (To-Do)
 async def todo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     chat_id = update.effective_chat.id
+    # Если вызов без аргументов, показать интерактивное меню
     if not context.args:
         keyboard = [
             [InlineKeyboardButton("Добавить", callback_data="todo_add")],
@@ -342,6 +343,22 @@ async def todo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else:
         await update.message.reply_text("Используйте subcommand add, list или remove.")
 
+# Интерактивное добавление задачи (обработка через callback)
+async def todo_add_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    context.user_data["todo_action"] = "add"
+    await update.message.reply_text("Введите текст задачи для добавления:")
+
+# Обработка текстового сообщения для добавления задачи
+async def todo_text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if context.user_data.get("todo_action") == "add":
+        task = update.message.text
+        chat_id = update.effective_chat.id
+        todo_tasks.setdefault(chat_id, []).append(task)
+        await update.message.reply_text(f"Задача добавлена: {task}")
+        context.user_data.pop("todo_action", None)
+    else:
+        await translation_text_handler(update, context)  # Если не todo, обрабатываем как перевод
+
 # Викторина (Quiz)
 async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     question_index = random.randrange(len(quiz_questions))
@@ -381,13 +398,7 @@ async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     else:
         await update.message.reply_text("Неизвестная настройка. Используйте show или city.")
 
-# Функция запроса геолокации для установки города по умолчанию
-async def request_location(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    keyboard = ReplyKeyboardMarkup([[KeyboardButton("Отправить местоположение", request_location=True)]],
-                                   one_time_keyboard=True, resize_keyboard=True)
-    await update.message.reply_text("Нажмите кнопку ниже, чтобы отправить своё местоположение:", reply_markup=keyboard)
-
-# Обработчик полученной геолокации
+# Обработка геолокации для установки города
 async def location_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if update.message.location:
         lat = update.message.location.latitude
@@ -481,18 +492,18 @@ async def unsubscribe(update: Update, context: ContextTypes.DEFAULT_TYPE) -> Non
 # Интерактивное меню с кнопками для всех функций
 async def menu(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("Напоминание", callback_data="menu_reminder")],
-        [InlineKeyboardButton("Погода", callback_data="menu_weather"),
-         InlineKeyboardButton("Прогноз", callback_data="menu_forecast")],
-        [InlineKeyboardButton("Курсы валют", callback_data="menu_rates"),
-         InlineKeyboardButton("Поиск", callback_data="menu_search")],
-        [InlineKeyboardButton("Конвертер", callback_data="menu_convert"),
-         InlineKeyboardButton("Перевод", callback_data="menu_translate")],
-        [InlineKeyboardButton("To-Do", callback_data="menu_todo"),
-         InlineKeyboardButton("Викторина", callback_data="menu_quiz")],
-        [InlineKeyboardButton("Настройки", callback_data="menu_settings"),
-         InlineKeyboardButton("Подписки", callback_data="menu_subscribe")],
-        [InlineKeyboardButton("Топ квиз", callback_data="menu_top_quiz")]
+        [InlineKeyboardButton("🔔 Напоминание", callback_data="menu_reminder")],
+        [InlineKeyboardButton("🌤 Погода", callback_data="menu_weather"),
+         InlineKeyboardButton("⛅ Прогноз", callback_data="menu_forecast")],
+        [InlineKeyboardButton("💱 Курсы", callback_data="menu_rates"),
+         InlineKeyboardButton("🔍 Поиск", callback_data="menu_search")],
+        [InlineKeyboardButton("🔄 Конвертер", callback_data="menu_convert"),
+         InlineKeyboardButton("🌐 Перевод", callback_data="menu_translate")],
+        [InlineKeyboardButton("📋 To-Do", callback_data="menu_todo"),
+         InlineKeyboardButton("❓ Викторина", callback_data="menu_quiz")],
+        [InlineKeyboardButton("⚙️ Настройки", callback_data="menu_settings"),
+         InlineKeyboardButton("📰 Подписки", callback_data="menu_subscribe")],
+        [InlineKeyboardButton("🏆 Топ квиз", callback_data="menu_top_quiz")]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Выберите опцию:", reply_markup=reply_markup)
@@ -587,12 +598,13 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
             reply_markup = InlineKeyboardMarkup(rows)
             await query.edit_message_text("Выберите, с какого языка переводить текст:", reply_markup=reply_markup)
         elif option == "todo":
-            tasks = todo_tasks.get(query.message.chat.id, [])
-            if tasks:
-                message = "<b>Ваш список задач:</b>\n" + "\n".join(f"{i+1}. {task}" for i, task in enumerate(tasks))
-            else:
-                message = "Список задач пуст. Добавьте задачу командой /todo add <текст>"
-            await query.edit_message_text(message, parse_mode=ParseMode.HTML)
+            keyboard = [
+                [InlineKeyboardButton("Добавить", callback_data="todo_add")],
+                [InlineKeyboardButton("Показать", callback_data="todo_list")],
+                [InlineKeyboardButton("Удалить", callback_data="todo_remove")]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await query.edit_message_text("Выберите действие с задачами:", reply_markup=reply_markup)
         elif option == "quiz":
             await quiz(update, context)
         elif option == "settings":
@@ -641,6 +653,35 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
                                            one_time_keyboard=True, resize_keyboard=True)
             await query.edit_message_text("Нажмите кнопку ниже, чтобы отправить своё местоположение:")
             await query.message.reply_text("Отправьте своё местоположение:", reply_markup=keyboard)
+    elif data.startswith("todo_"):
+        if data == "todo_add":
+            context.user_data["todo_action"] = "add"
+            await query.edit_message_text("Введите текст задачи для добавления:")
+        elif data == "todo_list":
+            tasks = todo_tasks.get(query.message.chat.id, [])
+            if tasks:
+                message = "<b>Ваш список задач:</b>\n" + "\n".join(f"{i+1}. {task}" for i, task in enumerate(tasks))
+            else:
+                message = "Список задач пуст."
+            await query.edit_message_text(message, parse_mode=ParseMode.HTML)
+        elif data == "todo_remove":
+            tasks = todo_tasks.get(query.message.chat.id, [])
+            if tasks:
+                keyboard = []
+                for i, task in enumerate(tasks):
+                    keyboard.append([InlineKeyboardButton(f"{i+1}. {task}", callback_data=f"todo_remove_{i}")])
+                reply_markup = InlineKeyboardMarkup(keyboard)
+                await query.edit_message_text("Выберите задачу для удаления:", reply_markup=reply_markup)
+            else:
+                await query.edit_message_text("Список задач пуст.")
+        elif data.startswith("todo_remove_"):
+            index = int(data.split("_")[2])
+            tasks = todo_tasks.get(query.message.chat.id, [])
+            if 0 <= index < len(tasks):
+                removed = tasks.pop(index)
+                await query.edit_message_text(f"Задача удалена: {removed}")
+            else:
+                await query.edit_message_text("Некорректный номер задачи.")
     elif data.startswith("subscribe_"):
         sub = data.split("_")[1]
         if sub == "weather":
@@ -650,8 +691,9 @@ async def callback_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     elif data.startswith("src_") or data.startswith("tgt_"):
         await translation_callback_handler(update, context)
 
-# Обработчик текстовых сообщений для интерактивного переводчика
+# Обработчик текстовых сообщений для интерактивного переводчика и задач
 async def translation_text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    # Если ожидается текст для перевода
     if context.user_data.get("awaiting_translation"):
         text = update.message.text
         src_lang = context.user_data.get("src_lang")
@@ -667,22 +709,13 @@ async def translation_text_handler(update: Update, context: ContextTypes.DEFAULT
         context.user_data.pop("awaiting_translation", None)
         context.user_data.pop("src_lang", None)
         context.user_data.pop("target_lang", None)
-
-# Обработчик геолокации для установки города по умолчанию
-async def location_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if update.message.location:
-        lat = update.message.location.latitude
-        lon = update.message.location.longitude
-        url = f"http://api.openweathermap.org/geo/1.0/reverse?lat={lat}&lon={lon}&limit=1&appid={OPENWEATHER_API_KEY}"
-        data = requests.get(url).json()
-        if data and isinstance(data, list) and data[0].get("name"):
-            city = data[0]["name"]
-            user_settings[update.effective_chat.id] = {"city": city}
-            await update.message.reply_text(f"Город по умолчанию установлен: {city}")
-        else:
-            await update.message.reply_text("Не удалось определить город по вашей геолокации.")
-    else:
-        await update.message.reply_text("Местоположение не получено.")
+    # Если ожидается текст для добавления задачи
+    elif context.user_data.get("todo_action") == "add":
+        task = update.message.text
+        chat_id = update.effective_chat.id
+        todo_tasks.setdefault(chat_id, []).append(task)
+        await update.message.reply_text(f"Задача добавлена: {task}")
+        context.user_data.pop("todo_action", None)
 
 # ------------------ Основная функция ------------------
 async def main() -> None:
@@ -709,7 +742,7 @@ async def main() -> None:
     # Обработчик callback'ов от inline-кнопок
     app.add_handler(CallbackQueryHandler(callback_handler))
     
-    # Обработчик текстовых сообщений для интерактивного переводчика
+    # Обработчик текстовых сообщений для интерактивного переводчика и для добавления задач
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, translation_text_handler))
     # Обработчик для геолокации
     app.add_handler(MessageHandler(filters.LOCATION, location_handler))
