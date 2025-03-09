@@ -369,7 +369,7 @@ async def quiz(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         for opt in question["options"]
     ]
     reply_markup = InlineKeyboardMarkup(buttons)
-    await update.message.reply_text(text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
+    await update.effective_message.reply_text(text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
 
 # Настройки пользователя
 async def settings(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
